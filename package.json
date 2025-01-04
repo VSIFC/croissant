@@ -1,7 +1,7 @@
 {
-  "name": "my-library",
+  "name": "croissant",
   "version": "1.0.0",
-  "description": "A description of your library",
+  "description": "A React components library to facilitate and visualise cross-platform, cross-device interactions.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
