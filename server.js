@@ -11,7 +11,7 @@ const server = app.listen(3000, () => {
 const wss = new WebSocket.Server({ server });
 
 wss.on('connection', (ws) => {
-  console.log('Client connected');
+  console.log('Client connected'); //everytime someone opens http://localhost:3000, a websocket connection is established between the client(user) and the server(this file)
 
   ws.on('message', (message) => {
     console.log(`Received: ${message}`);
