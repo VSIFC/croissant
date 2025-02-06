@@ -1,4 +1,11 @@
 const noble = require('@abandonware/noble');
+const WebSocket = require('ws');
+
+const ws = new WebSocket('ws://localhost:3000');
+
+ws.on('open', () => {
+  console.log('Connected to WebSocket server');
+});
 
 noble.on('stateChange', (state) => {
   if (state === 'poweredOn') {
@@ -9,9 +16,13 @@ noble.on('stateChange', (state) => {
 });
 
 noble.on('discover', (peripheral) => {
-  console.log(`Found device: ${peripheral.advertisement.localName}`);
-  if (peripheral.advertisement.localName?.includes('Apple Watch')) {
+  const deviceName = peripheral.advertisement.localName;
+  console.log(`Found device: ${deviceName}`);
+  if (deviceName?.includes('Apple Watch')) {
     console.log('Apple Watch found!');
     noble.stopScanning();
+  }
+  if (ws.readyState === WebSocket.OPEN && deviceName != null) {
+    ws.send(JSON.stringify({ deviceName }));
   }
 });
