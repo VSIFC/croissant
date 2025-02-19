@@ -1,26 +1,59 @@
-// server.js
 const express = require('express');
 const WebSocket = require('ws');
+const fs = require('fs');
+const { exec } = require('child_process');
+const path = require('path');
 
 const app = express();
 const server = app.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');
 });
 
+// Load device mappings
+const deviceMappingsPath = path.join(__dirname, 'deviceMappings.json');
+let deviceMappings = {};
+
+fs.readFile(deviceMappingsPath, 'utf8', (err, data) => {
+  if (err) {
+    console.error('Error reading device mappings:', err);
+    return;
+  }
+  deviceMappings = JSON.parse(data);
+});
+
 // Set up WebSocket server
 const wss = new WebSocket.Server({ server });
 
 wss.on('connection', (ws) => {
-  console.log('Client connected'); //everytime someone opens http://localhost:3000, a websocket connection is established between the client(user) and the server(this file)
+  console.log('Client connected');
 
   ws.on('message', (message) => {
     console.log(`Received: ${message}`);
-    // Broadcast the message to all clients
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(message);
-      }
-    });
+    const device = JSON.parse(message);
+    const mapping = deviceMappings.devices.find(d => d.deviceName === device.deviceName);
+
+    if (mapping) {
+      const { branchName } = mapping;
+      const commands = `
+        cd /project-directory &&
+        git checkout ${branchName} &&
+        npm i &&
+        npm start
+      `;
+
+      exec(commands, (error, stdout, stderr) => {
+        if (error) {
+          console.error(`Error executing commands: ${error}`);
+          ws.send(JSON.stringify({ type: 'error', message: `Error: ${error.message}` }));
+          return;
+        }
+        console.log(`stdout: ${stdout}`);
+        console.error(`stderr: ${stderr}`);
+        ws.send(JSON.stringify({ type: 'success', message: 'Commands executed successfully' }));
+      });
+    } else {
+      ws.send(JSON.stringify({ type: 'error', message: 'Device not recognized' }));
+    }
   });
 
   ws.on('close', () => {
