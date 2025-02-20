@@ -23,6 +23,7 @@ noble.on('discover', (peripheral) => {
     noble.stopScanning();
   }
   if (ws.readyState === WebSocket.OPEN && deviceName != null) {
+    console.log(`Sending device to server: ${deviceName}`);
     ws.send(JSON.stringify({ deviceName }));
   }
 });

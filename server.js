@@ -28,7 +28,7 @@ wss.on('connection', (ws) => {
   console.log('Client connected');
 
   ws.on('message', (message) => {
-    console.log(`Received: ${message}`);
+    console.log(`Received message from client: ${message}`);
     const device = JSON.parse(message);
     const mapping = deviceMappings.devices.find(d => d.deviceName === device.deviceName);
 
@@ -54,6 +54,14 @@ wss.on('connection', (ws) => {
     } else {
       ws.send(JSON.stringify({ type: 'error', message: 'Device not recognized' }));
     }
+
+    // Broadcast the device to all connected clients
+    console.log(`Broadcasting device to clients: ${JSON.stringify(device)}`);
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(device));
+      }
+    });
   });
 
   ws.on('close', () => {
@@ -63,3 +71,6 @@ wss.on('connection', (ws) => {
 
 // Serve static files (React app)
 app.use(express.static('public'));
+
+// Serve the dist directory
+app.use('/dist', express.static(path.join(__dirname, 'dist')));

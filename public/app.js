@@ -1,25 +1,55 @@
-const root = document.getElementById('root');
+import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
+import Onboarding from './Onboarding';
+import BluetoothDevices from './BluetoothDevices';
+
+const rootElement = document.getElementById('root');
 
 function App() {
-  const [deviceName, setDeviceName] = React.useState('');
-  const [connectionStatus, setConnectionStatus] = React.useState('Disconnected');
-  const [ws, setWs] = React.useState(null);
+  const [email, setEmail] = useState(null);
+  const [deviceName, setDeviceName] = useState('');
+  const [connectionStatus, setConnectionStatus] = useState('Disconnected');
+  const [ws, setWs] = useState(null);
+  const [devices, setDevices] = useState([]);
+  const [logs, setLogs] = useState([]);
 
-  React.useEffect(() => {
-    // Connect to WebSocket server
-    const websocket = new WebSocket('ws://localhost:3000');
-    setWs(websocket);
+  useEffect(() => {
+    if (email) {
+      // Connect to WebSocket server
+      const websocket = new WebSocket('ws://localhost:3000');
+      setWs(websocket);
 
-    websocket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setDeviceName(data.deviceName);
-      setConnectionStatus(data.status);
-    };
+      websocket.onopen = () => {
+        console.log('Connected to WebSocket server');
+      };
 
-    return () => {
-      websocket.close();
-    };
-  }, []);
+      websocket.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        console.log(`Received message from server: ${event.data}`);
+        if (data.type === 'log') {
+          setLogs((prevLogs) => [...prevLogs, data.message]);
+        } else {
+          setDevices((prevDevices) => [...prevDevices, data]);
+        }
+      };
+
+      websocket.onerror = (error) => {
+        console.error(`WebSocket error: ${error.message}`);
+      };
+
+      websocket.onclose = () => {
+        console.log('Disconnected from WebSocket server');
+      };
+
+      return () => {
+        websocket.close();
+      };
+    }
+  }, [email]);
+
+  const handleEmailSubmit = (email) => {
+    setEmail(email);
+  };
 
   const connectToDevice = async () => {
     try {
@@ -44,14 +74,27 @@ function App() {
     }
   };
 
-  return React.createElement(
-    'div',
-    null,
-    React.createElement('h1', null, 'Bluetooth Connection'),
-    React.createElement('button', { onClick: connectToDevice }, 'Connect to Apple Watch'),
-    React.createElement('p', null, `Device Name: ${deviceName}`),
-    React.createElement('p', null, `Status: ${connectionStatus}`)
+  if (!email) {
+    return <Onboarding onEmailSubmit={handleEmailSubmit} />;
+  }
+
+  return (
+    <div>
+      <h1>Bluetooth Connection</h1>
+      <button onClick={connectToDevice}>Connect to Apple Watch</button>
+      <p>Device Name: {deviceName}</p>
+      <p>Status: {connectionStatus}</p>
+      <BluetoothDevices devices={devices} />
+      <div>
+        <h2>Logs</h2>
+        <ul>
+          {logs.map((log, index) => (
+            <li key={index}>{log}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
   );
 }
 
-ReactDOM.render(React.createElement(App), root);
+ReactDOM.render(<App />, rootElement);
