@@ -17,7 +17,7 @@ noble.on('stateChange', (state) => {
 
 noble.on('discover', (peripheral) => {
   const deviceName = peripheral.advertisement.localName;
-  console.log(`Found device: ${deviceName}`);
+//   console.log(`Found device: ${deviceName}`);
   if (deviceName?.includes('Apple Watch')) {
     console.log('Apple Watch found!');
     noble.stopScanning();
@@ -25,5 +25,7 @@ noble.on('discover', (peripheral) => {
   if (ws.readyState === WebSocket.OPEN && deviceName != null) {
     console.log(`Sending device to server: ${deviceName}`);
     ws.send(JSON.stringify({ deviceName }));
-  }
+//   } else {
+//     console.log('Device name is null or WebSocket is not open');
+ }
 });

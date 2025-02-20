@@ -30,6 +30,7 @@ function App() {
           setLogs((prevLogs) => [...prevLogs, data.message]);
         } else {
           setDevices((prevDevices) => [...prevDevices, data]);
+          console.log(`Updated device list: `, [...devices, data]);
         }
       };
 

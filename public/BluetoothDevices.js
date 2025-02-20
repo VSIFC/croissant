@@ -6,7 +6,7 @@ const BluetoothDevices = ({ devices }) => {
       <h2>Discovered Bluetooth Devices</h2>
       <ul>
         {devices.map((device, index) => (
-          <li key={index}>{device.name}</li>
+          <li key={index}>{device.deviceName}</li>
         ))}
       </ul>
     </div>
