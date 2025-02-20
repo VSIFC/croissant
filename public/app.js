@@ -29,8 +29,11 @@ function App() {
         if (data.type === 'log') {
           setLogs((prevLogs) => [...prevLogs, data.message]);
         } else {
-          setDevices((prevDevices) => [...prevDevices, data]);
-          console.log(`Updated device list: `, [...devices, data]);
+          setDevices((prevDevices) => {
+            const updatedDevices = prevDevices.filter(device => device.deviceName !== data.deviceName);
+            return [...updatedDevices, data];
+          });
+          console.log(`Updated device list: `, devices);
         }
       };
 
@@ -47,6 +50,15 @@ function App() {
       };
     }
   }, [email]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setDevices((prevDevices) => prevDevices.filter(device => now - device.timestamp < 10000)); // 10 seconds timeout
+    }, 5000); // Check every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
 
   const handleEmailSubmit = (email) => {
     setEmail(email);
