@@ -1,8 +1,12 @@
-
-
+### First Time Running This Code Base
+1. Install nodeJS.
+2. open a terminal and run the server (powers websocket server and reactJS server):
 ```
-npm init -y #don't run this - just sharing so you know how I created this code base
-npm i #updates all packages defined in package.json
-node server.js #starts react server without hot reload
-
+npm i
+npm run build
+npm start
+```
+3. open another terminal, and run the bluetooth device discovery daemon:
+```
+node scan.js
 ```
