@@ -92,17 +92,21 @@ function App() {
   }
 
   return (
-    <div>
-      <h1>Bluetooth Connection</h1>
-      <button onClick={connectToDevice}>Connect to Apple Watch</button>
-      <p>Device Name: {deviceName}</p>
-      <p>Status: {connectionStatus}</p>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
+      <h1 className="text-4xl font-bold mb-6">Bluetooth Connection</h1>
+      <button onClick={connectToDevice} className="mb-6 p-3 rounded bg-gray-700 hover:bg-gray-600 text-white font-semibold">
+        Connect to Apple Watch
+      </button>
+      <p className="mb-4">Device Name: {deviceName}</p>
+      <p className="mb-4">Status: {connectionStatus}</p>
       <BluetoothDevices devices={devices} />
-      <div>
-        <h2>Logs</h2>
-        <ul>
+      <div className="mt-6 w-full max-w-2xl">
+        <h2 className="text-2xl font-bold mb-4">Logs</h2>
+        <ul className="list-none">
           {logs.map((log, index) => (
-            <li key={index}>{log}</li>
+            <li key={index} className="mb-2 p-2 bg-gray-800 rounded">
+              {log}
+            </li>
           ))}
         </ul>
       </div>
