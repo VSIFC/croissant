@@ -7,7 +7,7 @@ const BluetoothDevices = ({ devices }) => {
       <ul className="list-none">
         {devices.map((device, index) => (
           <li key={index} className="mb-2 p-2 bg-gray-800 rounded">
-            {device.deviceName}
+            {device.deviceName} - {device.distanceProxyInMetres.toFixed(2)} meters
           </li>
         ))}
       </ul>
