@@ -19,6 +19,7 @@ fs.readFile(deviceMappingsPath, 'utf8', (err, data) => {
     return;
   }
   deviceMappings = JSON.parse(data);
+//   console.log('Loaded device mappings:', deviceMappings);
 });
 
 // Set up WebSocket server
@@ -28,35 +29,39 @@ wss.on('connection', (ws) => {
   console.log('Client connected');
 
   ws.on('message', (message) => {
-    // console.log(`Received message from client: ${message}`);
     const device = JSON.parse(message);
-    const mapping = deviceMappings.devices.find(d => d.deviceName === device.deviceName);
+    // console.log('Received device:', device.deviceName);
+    // console.log("type of Receive device: ", typeof(device.deviceName));
+    
+    // Ensure deviceMappings.devices is an array
+    if (Array.isArray(deviceMappings.devices)) {
+    //   console.log('Device mappings:', deviceMappings.devices);
+      const mapping = deviceMappings.devices.find(d => d.deviceName.replace(/[^a-zA-Z]/g, '') == device.deviceName.replace(/[^a-zA-Z]/g, ''));
+      if (mapping) {
+        console.log("deviceMappings.device.deviceName:", deviceMappings.devices[0].deviceName.replace(/[^a-zA-Z]/g, ''));
+        console.log("device.deviceName:", device.deviceName.replace(/[^a-zA-Z]/g, ''));
+        console.log('Found mapping:', mapping);  
+        const commands = `pwd`;
 
-    if (mapping) {
-      const { branchName } = mapping;
-      const commands = `
-        cd /project-directory &&
-        git checkout ${branchName} &&
-        npm i &&
-        npm start
-      `;
-
-      exec(commands, (error, stdout, stderr) => {
-        if (error) {
-          console.error(`Error executing commands: ${error}`);
-          ws.send(JSON.stringify({ type: 'error', message: `Error: ${error.message}` }));
-          return;
-        }
-        console.log(`stdout: ${stdout}`);
-        console.error(`stderr: ${stderr}`);
-        ws.send(JSON.stringify({ type: 'success', message: 'Commands executed successfully' }));
-      });
+        exec(commands, (error, stdout, stderr) => {
+          if (error) {
+            console.error(`Error executing commands: ${error}`);
+            ws.send(JSON.stringify({ type: 'error', message: `Error: ${error.message}` }));
+            return;
+          }
+          console.log(`stdout: ${stdout}`);
+          console.error(`stderr: ${stderr}`);
+          ws.send(JSON.stringify({ type: 'success', message: `Command executed successfully: ${stdout}` }));
+        });
+      } else {
+        ws.send(JSON.stringify({ type: 'error', message: 'Device not recognized' }));
+      }
     } else {
-      ws.send(JSON.stringify({ type: 'error', message: 'Device not recognized' }));
+      console.error('Device mappings are not in the expected format');
+      ws.send(JSON.stringify({ type: 'error', message: 'Device mappings are not in the expected format' }));
     }
 
     // Broadcast the device to all connected clients
-    // console.log(`Broadcasting device to clients: ${JSON.stringify(device)}`);
     wss.clients.forEach((client) => {
       if (client.readyState === WebSocket.OPEN) {
         client.send(JSON.stringify(device));
