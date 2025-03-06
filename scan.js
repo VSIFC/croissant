@@ -23,9 +23,9 @@ noble.on('discover', (peripheral) => {
   console.log(`Found device: ${deviceName} with RSSI: ${rssi}`);
   if (ws.readyState === WebSocket.OPEN && deviceName != null) {
     const timestamp = Date.now();
-    devices.set(deviceName, { timestamp, rssi });
-    console.log(`Sending device to server: ${deviceName}`);
     const distanceProxyInMetres = approximateDistance(rssi);
+    devices.set(deviceName, { timestamp, rssi, distanceProxyInMetres });
+    console.log(`Sending device to server: ${deviceName}`);
     ws.send(JSON.stringify({ deviceName, timestamp, distanceProxyInMetres }));
   }
 });
@@ -44,16 +44,16 @@ setInterval(() => {
 
 // Function to approximate distance based on RSSI
 function approximateDistance(rssi) {
-    const txPower = -59; // Typical RSSI value at 1 meter distance
-    if (rssi == 0) {
-      return -1.0; // if we cannot determine distance, return -1.
-    }
-  
-    const ratio = rssi / txPower;
-    if (ratio < 1.0) {
-      return Math.pow(ratio, 10);
-    } else {
-      const distance = (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
-      return distance;
-    }
+  const txPower = -59; // Typical RSSI value at 1 meter distance
+  if (rssi == 0) {
+    return -1.0; // if we cannot determine distance, return -1.
   }
+
+  const ratio = rssi / txPower;
+  if (ratio < 1.0) {
+    return Math.pow(ratio, 10);
+  } else {
+    const distance = (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
+    return distance;
+  }
+}
