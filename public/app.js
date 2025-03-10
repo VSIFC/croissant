@@ -72,29 +72,6 @@ function App() {
     setEmail(email);
   };
 
-  const connectToDevice = async () => {
-    try {
-      const device = await navigator.bluetooth.requestDevice({
-        filters: [{ namePrefix: 'Apple Watch' }],
-        optionalServices: ['battery_service'], // Add required services
-      });
-
-      setDeviceName(device.name);
-      setConnectionStatus('Connecting...');
-
-      const server = await device.gatt.connect();
-      setConnectionStatus('Connected');
-
-      // Send connection status and device name to WebSocket server
-      if (ws) {
-        ws.send(JSON.stringify({ deviceName: device.name, status: 'Connected' }));
-      }
-    } catch (error) {
-      console.error('Error connecting to device:', error);
-      setConnectionStatus('Disconnected');
-    }
-  };
-
   if (!email) {
     return <Onboarding onEmailSubmit={handleEmailSubmit} />;
   }
@@ -102,11 +79,6 @@ function App() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white">
       <h1 className="text-4xl font-bold mb-6">Bluetooth Connection</h1>
-      <button onClick={connectToDevice} className="mb-6 p-3 rounded bg-gray-700 hover:bg-gray-600 text-white font-semibold">
-        Connect to Apple Watch
-      </button>
-      <p className="mb-4">Device Name: {deviceName}</p>
-      <p className="mb-4">Status: {connectionStatus}</p>
       <BluetoothDevices devices={devices} />
       <div className="mt-6 w-full max-w-2xl">
         <h2 className="text-2xl font-bold mb-4">Logs</h2>
