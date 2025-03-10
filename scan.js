@@ -21,7 +21,7 @@ noble.on('discover', (peripheral) => {
   const deviceName = peripheral.advertisement.localName;
   const rssi = peripheral.rssi;
   console.log(`Found device: ${deviceName} with RSSI: ${rssi}`);
-  if (ws.readyState === WebSocket.OPEN && deviceName != null) {
+  if (ws.readyState === WebSocket.OPEN && deviceName != null && rssi != null) {
     const timestamp = Date.now();
     const distanceProxyInMetres = approximateDistance(rssi);
     devices.set(deviceName, { timestamp, rssi, distanceProxyInMetres });
@@ -31,16 +31,16 @@ noble.on('discover', (peripheral) => {
 });
 
 // Periodically check and remove stale devices
-setInterval(() => {
-  const now = Date.now();
-  devices.forEach((data, deviceName) => {
-    if (now - data.timestamp > DEVICE_TIMEOUT) {
-      devices.delete(deviceName);
-      console.log(`Device ${deviceName} removed due to timeout`);
-      ws.send(JSON.stringify({ deviceName, status: 'removed' }));
-    }
-  });
-}, DEVICE_TIMEOUT / 2);
+// setInterval(() => {
+//   const now = Date.now();
+//   devices.forEach((data, deviceName) => {
+//     if (now - data.timestamp > DEVICE_TIMEOUT) {
+//       devices.delete(deviceName);
+//       console.log(`Device ${deviceName} removed due to timeout`);
+//       ws.send(JSON.stringify({ deviceName, status: 'removed' }));
+//     }
+//   });
+// }, DEVICE_TIMEOUT / 2);
 
 // Function to approximate distance based on RSSI
 function approximateDistance(rssi) {

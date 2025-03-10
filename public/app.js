@@ -24,16 +24,20 @@ function App() {
       };
 
       websocket.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        console.log(`Received message from server: ${event.data}`);
-        if (data.type === 'log') {
-          setLogs((prevLogs) => [...prevLogs, data.message]);
-        } else {
-          setDevices((prevDevices) => {
-            const updatedDevices = prevDevices.filter(device => device.deviceName !== data.deviceName);
-            return [...updatedDevices, data];
-          });
-          console.log(`Updated device list: `, devices);
+        try {
+          const data = JSON.parse(event.data);
+          console.log(`Received message from server: ${event.data}`);
+          if (data.type === 'log') {
+            setLogs((prevLogs) => [...prevLogs, data.message]);
+          } else {
+            setDevices((prevDevices) => {
+              const updatedDevices = prevDevices.filter(device => device.deviceName !== data.deviceName);
+              return [...updatedDevices, data];
+            });
+            console.log(`Updated device list: `, devices);
+          }
+        } catch (error) {
+          console.error('Error processing WebSocket message:', error);
         }
       };
 
@@ -53,9 +57,13 @@ function App() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const now = Date.now();
-      setDevices((prevDevices) => prevDevices.filter(device => now - device.timestamp < 10000)); // 10 seconds timeout
-    }, 5000); // Check every 5 seconds
+      try {
+        const now = Date.now();
+        setDevices((prevDevices) => prevDevices.filter(device => now - device.timestamp < 10000)); // 10 seconds timeout
+      } catch (error) {
+        console.error('Error in interval function:', error);
+      }
+    }, 10000); // Check every 5 seconds
 
     return () => clearInterval(interval);
   }, []);

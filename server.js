@@ -38,10 +38,10 @@ wss.on('connection', (ws) => {
     //   console.log('Device mappings:', deviceMappings.devices);
       const mapping = deviceMappings.devices.find(d => d.deviceName.replace(/[^a-zA-Z]/g, '') == device.deviceName.replace(/[^a-zA-Z]/g, ''));
       if (mapping) {
-        console.log("deviceMappings.device.deviceName:", deviceMappings.devices[0].deviceName.replace(/[^a-zA-Z]/g, ''));
-        console.log("device.deviceName:", device.deviceName.replace(/[^a-zA-Z]/g, ''));
-        console.log('Found mapping:', mapping);  
-        const commands = `pwd`;
+        // console.log("deviceMappings.device.deviceName:", deviceMappings.devices[0].deviceName.replace(/[^a-zA-Z]/g, ''));
+        // console.log("device.deviceName:", device.deviceName.replace(/[^a-zA-Z]/g, ''));
+        // console.log('Found mapping:', mapping);  
+        const commands = `cd "/Users/carey/PersonalProjs/sleepisoverato"`;
 
         exec(commands, (error, stdout, stderr) => {
           if (error) {
