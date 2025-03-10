@@ -26,13 +26,28 @@ function App() {
       websocket.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          console.log(`Received message from server: ${event.data}`);
+          // console.log(`Received message from server: ${event.data}. Data type: ${data.type}`);
           if (data.type === 'log') {
             setLogs((prevLogs) => [...prevLogs, data.message]);
           } else {
             setDevices((prevDevices) => {
-              const updatedDevices = prevDevices.filter(device => device.deviceName !== data.deviceName);
-              return [...updatedDevices, data];
+              const now = Date.now();
+              const updatedDevices = prevDevices.map(device => {
+                if (device.deviceName === data.deviceName) {
+                  return { ...device, ...data, timestamp: now };
+                }
+                return device;
+              });
+
+              const isNewDevice = !updatedDevices.some(device => device.deviceName === data.deviceName);
+              if (isNewDevice) {
+                console.log(`New device found: ${data.deviceName}`);
+                updatedDevices.push({ ...data, timestamp: now });
+              }
+
+              // Sort devices: devices received within the past 10 seconds stay at the top
+              // Sort devices alphabetically by deviceName
+              return updatedDevices.sort((a, b) => a.deviceName.localeCompare(b.deviceName));
             });
             console.log(`Updated device list: `, devices);
           }
@@ -63,7 +78,7 @@ function App() {
       } catch (error) {
         console.error('Error in interval function:', error);
       }
-    }, 10000); // Check every 5 seconds
+    }, 10000); // Check every 10 seconds
 
     return () => clearInterval(interval);
   }, []);
