@@ -44,7 +44,10 @@ export $(grep -v '^#' .env.local | xargs) && npx prisma migrate dev --name [some
 ```
 export $(grep -v '^#' .env | xargs) && npx prisma migrate deploy
 ```
-
+### visualising the data on prod/dev
+```
+npx prisma studio
+```
 **note: DO NOT delete migrations folder, ever. `git pull` and rebase on `main` branch if migrations are missing locally.**
 
 
