@@ -1,5 +1,20 @@
 Some system to allow software engineers to politely disturb their team's senior engineer without disrupting their workflow. 
 
+# Onboarding
+
+## Installation
+Set up ssh keys to this github repo. Then save the following code as a `.sh` and run it in Terminal: 
+```
+#assume you have a fresh m1 (and above) machine
+sudo su
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install postgresql^16
+brew install nvm^0.39.1
+brew install nodeJS^v23.9.0
+git@github.com:VSIFC/croissant.git
+cd croissant
+npm i 
+```
 ## How to use this repo
 This readme on main describes the general updates, TODOS for frontend/backend and updates that can't be quantified as code this repo(deployment settings, setting up cloud infra).
 
@@ -17,6 +32,25 @@ npm start
 ```
 node scan.js
 ```
+
+## Running Database Migrations
+### dev (localhost)
+```
+sudo -u $(whoami) createuser --superuser postgres
+psql -U postgres -c "ALTER USER postgres PASSWORD 'postgres';"
+export $(grep -v '^#' .env.local | xargs) && npx prisma migrate dev --name [some-meaningful-name-delineated-by-dashes]
+```
+### production
+```
+export $(grep -v '^#' .env | xargs) && npx prisma migrate deploy
+```
+### visualising the data on prod/dev
+```
+npx prisma studio
+```
+**note: DO NOT delete migrations folder, ever. `git pull` and rebase on `main` branch if migrations are missing locally.**
+
+
 
 ## What's Deployed and Where?
 | Branch | Frontend  | Backend | Db |
