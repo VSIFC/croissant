@@ -21,7 +21,11 @@
   "description": "",
   "dependencies": {
     "@abandonware/noble": "^1.9.2-25",
+    "@prisma/client": "^6.4.1",
+    "@supabase/supabase-js": "^2.49.1",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "prisma": "^6.4.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "ws": "^8.18.0"
@@ -30,11 +34,11 @@
     "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.16.0",
     "@babel/preset-react": "^7.16.0",
+    "autoprefixer": "^10.2.6",
     "babel-loader": "^8.2.3",
-    "webpack": "^5.38.1",
-    "webpack-cli": "^4.7.2",
-    "tailwindcss": "^3.0.0",
     "postcss": "^8.3.6",
-    "autoprefixer": "^10.2.6"
+    "tailwindcss": "^3.0.0",
+    "webpack": "^5.38.1",
+    "webpack-cli": "^4.7.2"
   }
 }
