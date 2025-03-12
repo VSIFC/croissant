@@ -34,23 +34,26 @@ node scan.js
 ```
 
 ## Running Database Migrations
-### dev (localhost)
+#### First Time Running your local Database
 ```
 sudo -u $(whoami) createuser --superuser postgres
 psql -U postgres -c "ALTER USER postgres PASSWORD 'postgres';"
+```
+### If you want to use Prisma Studio to visualise your database schema, do this:
+
+#### DEV
+```
 export $(grep -v '^#' .env.local | xargs) && npx prisma migrate dev --name [some-meaningful-name-delineated-by-dashes]
 ```
-### production
+#### production
 ```
 export $(grep -v '^#' .env | xargs) && npx prisma migrate deploy
 ```
-### visualising the data on prod/dev
 ```
+npx prisma generate
 npx prisma studio
 ```
 **note: DO NOT delete migrations folder, ever. `git pull` and rebase on `main` branch if migrations are missing locally.**
-
-
 
 ## What's Deployed and Where?
 | Branch | Frontend  | Backend | Db |
@@ -71,7 +74,7 @@ npx prisma studio
 ## TODO - General
 - [x] requirement analysis, architecture planning for scalability (see google docs for defined behavior, then chatGPT conversations)
 - [x] set up proj structure using npm for client and server folders, helper functions 
-- [ ] deploy from master branch (when you can onboard 1 team of engineers)
+- [ ] deploy final version from master branch (when you can onboard 1 team of engineers)
 - [ ] update deployment notes here w.r.t main branch
 
 ## TODO - frontend 
